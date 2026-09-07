@@ -114,9 +114,34 @@ class StartWithHud
         return 0;
     }
 
+    // If this package is unpacked directly inside the Darkest Dungeon game
+    // root folder (the common portable setup), locate the game beside it.
+    static string FindLocalDarkest()
+    {
+        // Game root layout: .../DarkestDungeon/_windows/win64/Darkest.exe
+        string rootLayout = Path.Combine(BaseDir, "_windows", "win64", "Darkest.exe");
+        if (File.Exists(rootLayout)) return rootLayout;
+
+        // Also cover the case where the package is unpacked in the same
+        // folder as Darkest.exe itself.
+        string sameDir = Path.Combine(BaseDir, "Darkest.exe");
+        if (File.Exists(sameDir)) return sameDir;
+
+        return null;
+    }
+
     static string FindGameExe()
     {
-        // 1. Use existing game_path.txt if present and valid.
+        // 1. If users put this package in the Darkest Dungeon game root folder,
+        //    use that location first. This is the most common portable setup.
+        string localExe = FindLocalDarkest();
+        if (localExe != null)
+        {
+            TryWriteGamePath(localExe);
+            return localExe;
+        }
+
+        // 2. Use existing game_path.txt if present and valid.
         if (File.Exists(GamePathFile))
         {
             string line = File.ReadAllLines(GamePathFile).FirstOrDefault(x => !string.IsNullOrWhiteSpace(x));
@@ -127,7 +152,7 @@ class StartWithHud
             }
         }
 
-        // 2. Auto-detect Steam install path from registry.
+        // 3. Auto-detect Steam install path from registry.
         var steamRoots = new System.Collections.Generic.List<string>();
         string registryPath = GetRegistrySteamPath();
         if (!string.IsNullOrWhiteSpace(registryPath))
@@ -135,7 +160,7 @@ class StartWithHud
             AddLibraryFolders(registryPath, steamRoots);
         }
 
-        // 3. Include common defaults as fallback.
+        // 4. Include common defaults as fallback.
         string[] fallbackRoots = new string[]
         {
             @"C:\Program Files (x86)\Steam",

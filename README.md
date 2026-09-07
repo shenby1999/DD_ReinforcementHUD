@@ -55,12 +55,20 @@
 #### 直接运行
 
 1. 确保已安装并启动 Steam，同时已安装暗黑地牢。
-2. 双击 `启动HUD.bat`。
-3. 如果启动器找不到游戏，请在 `StartWithHud.exe` 同目录下创建 `game_path.txt`，写入 `Darkest.exe` 的完整路径，例如：
+2. 推荐直接把整个程序包解压到游戏根目录，例如：
+   ```
+   ...\steamapps\common\DarkestDungeon\
+   ```
+   使 `StartWithHud.exe` 与游戏根目录下的 `_windows` 文件夹同级。
+3. 双击 `启动HUD.bat`。启动器在没有检测到游戏进程时，会优先在程序所在目录查找：
+   ```
+   _windows\win64\Darkest.exe
+   ```
+4. 如果启动器仍然找不到游戏，请在 `StartWithHud.exe` 同目录下创建 `game_path.txt`，写入 `Darkest.exe` 的完整路径，例如：
    ```
    D:/Steam/steamapps/common/DarkestDungeon/_windows/win64/Darkest.exe
    ```
-4. 如果游戏已经运行，启动器会附加到游戏并自动注入 HUD；如果 HUD 已注入，则会自动跳过，避免重复注入。
+5. 如果游戏已经运行，启动器会附加到游戏并自动注入 HUD；如果 HUD 已注入，则会自动跳过，避免重复注入。
 
 #### 文件说明
 
@@ -77,12 +85,20 @@
 #### Ready-to-run
 
 1. Install and start Steam. Make sure Darkest Dungeon is installed.
-2. Double-click `启动HUD.bat`.
-3. If the launcher cannot find the game, create `game_path.txt` next to `StartWithHud.exe` with the full path to `Darkest.exe`, for example:
+2. Recommended: unpack the whole package into the game root folder, e.g.:
+   ```
+   ...\steamapps\common\DarkestDungeon\
+   ```
+   `StartWithHud.exe` should be in the same folder as the `_windows` directory.
+3. Double-click `启动HUD.bat`. When no game process is found, the launcher first looks next to itself for:
+   ```
+   _windows\win64\Darkest.exe
+   ```
+4. If the launcher still cannot find the game, create `game_path.txt` next to `StartWithHud.exe` with the full path to `Darkest.exe`, for example:
    ```
    D:/Steam/steamapps/common/DarkestDungeon/_windows/win64/Darkest.exe
    ```
-4. If the game is already running, the launcher attaches to it and injects the HUD. If the HUD is already loaded, it skips injection.
+5. If the game is already running, the launcher attaches to it and injects the HUD. If the HUD is already loaded, it skips injection.
 
 #### Files
 
