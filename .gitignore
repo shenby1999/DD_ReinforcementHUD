@@ -1,0 +1,6 @@
+# Generated runtime files
+game_path.txt
+*.log
+
+# Local scanner candidate files
+cands.txt
