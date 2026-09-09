@@ -9,8 +9,8 @@ A small HUD that shows how many rounds remain before the next reinforcement wave
 
 1. 把整个文件夹里的内容解压到暗黑地牢**游戏根目录**，和 `_windows` 文件夹同级。  
    Unpack all files into the Darkest Dungeon game root, in the same folder as `_windows`.
-2. 双击 `启动HUD.bat`。  
-   Double-click `启动HUD.bat`.
+2. 双击 `StartHUD.bat`。  
+   Double-click `StartHUD.bat`.
 3. 如果游戏没开，会自动找到并启动游戏；如果游戏已开，会直接附加并注入 HUD。  
    It starts the game automatically, or attaches if Darkest Dungeon is already running.
 4. 进入战斗后，屏幕顶部会显示数字。  
@@ -41,7 +41,7 @@ D:/Steam/steamapps/common/DarkestDungeon/_windows/win64/Darkest.exe
 ## 常见问题 / FAQ
 
 - **HUD 没出现？**  
-  确保四个文件在同一目录：`StartWithHud.exe`、`Injector.exe`、`ReinforcementHudColor.dll`、`启动HUD.bat`。如果已经在游戏里，先退出游戏再运行。
+  确保四个文件在同一目录：`StartWithHud.exe`、`Injector.exe`、`ReinforcementHudColor.dll`、`StartHUD.bat`。如果已经在游戏里，先退出游戏再运行。
 
 - **提示找不到游戏？**  
   使用上面的 `game_path.txt` 手动指定游戏路径。
@@ -60,7 +60,7 @@ D:/Steam/steamapps/common/DarkestDungeon/_windows/win64/Darkest.exe
 StartWithHud.exe          启动/附加游戏并自动注入 HUD
 Injector.exe              原生 DLL 注入器
 ReinforcementHudColor.dll OpenGL HUD 插件
-启动HUD.bat               一键启动入口
+StartHUD.bat               一键启动入口
 game_path.txt             可选，手动指定 Darkest.exe 路径
 ```
 
