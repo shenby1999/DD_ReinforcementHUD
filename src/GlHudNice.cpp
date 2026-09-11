@@ -55,8 +55,10 @@ static PFN_glUniform4f glUniform4f;
 
 static void LogMsg(const char* msg)
 {
-    FILE* f = fopen("ReinforcementHudColor.log", "a");
-    if (f) { fprintf(f, "%s\n", msg); fclose(f); }
+    // No file I/O: MO2's usvfs hooks file APIs and DllMain/loader-lock
+    // interaction with those hooks can crash the game. Debug output is safe.
+    OutputDebugStringA(msg);
+    OutputDebugStringA("\n");
 }
 
 static void* GetProc(const char* name)
@@ -154,6 +156,7 @@ static void AddRect(float* &out, float x0, float y0, float x1, float y1, int w, 
 
 static void AddSegments(float* &out, int digit, float ox, float oy, float w, float h, int viewW, int viewH)
 {
+    if (digit < 0 || digit > 9) return;
     float thick = h*0.08f;
     float hx0=ox, hx1=ox+w;
     float vx0=ox, vx1=ox+thick;
@@ -210,6 +213,7 @@ static void DrawOverlay()
         rem = summon - count;
     }
     if (rem < 0) rem = 0;
+    if (rem > 9) rem = 9; // seven-segment display range
 
     float nr=1.0f, ng=0.75f, nb=0.1f; // amber/gold default
     if (rem == 2) { nr=1.0f; ng=0.55f; nb=0.0f; }      // orange
@@ -272,7 +276,7 @@ static void DrawOverlay()
         DrawVerts(verts, pipBgCount, 0.0f, 0.0f, 0.0f, 0.6f);
 
         p = verts;
-        for (int i=0; i<rem; i++) {
+        for (int i=0; i<rem && i<4; i++) {
             float x0 = startX + i*(pipW+gap);
             AddRect(p, x0, pipY, x0+pipW, pipY+pipH, w, h);
         }
@@ -306,17 +310,29 @@ static void WINAPI Hook(void* window)
 static void* FindIATEntry()
 {
     BYTE* base=(BYTE*)GetModuleHandleA(NULL);
+    if(!base) return 0;
+
     IMAGE_DOS_HEADER* dos=(IMAGE_DOS_HEADER*)base;
+    if(dos->e_magic != IMAGE_DOS_SIGNATURE) return 0;
+
     IMAGE_NT_HEADERS* nt=(IMAGE_NT_HEADERS*)(base+dos->e_lfanew);
+    if(nt->Signature != IMAGE_NT_SIGNATURE) return 0;
+
     IMAGE_DATA_DIRECTORY d=nt->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT];
+    if(!d.VirtualAddress || d.Size < sizeof(IMAGE_IMPORT_DESCRIPTOR)) return 0;
+
     IMAGE_IMPORT_DESCRIPTOR* desc=(IMAGE_IMPORT_DESCRIPTOR*)(base+d.VirtualAddress);
     for(;desc->Name;desc++){
         const char* nm=(const char*)(base+desc->Name);
-        if(_stricmp(nm,"SDL2.dll"))continue;
+        if(_stricmp(nm,"SDL2.dll")) continue;
+
+        // Guard against import tables that do not provide the name thunk.
+        if(!desc->OriginalFirstThunk || !desc->FirstThunk) return 0;
+
         IMAGE_THUNK_DATA64* oft=(IMAGE_THUNK_DATA64*)(base+desc->OriginalFirstThunk);
         IMAGE_THUNK_DATA64* ft=(IMAGE_THUNK_DATA64*)(base+desc->FirstThunk);
-        for(int i=0;;i++){
-            if(!oft[i].u1.AddressOfData && !ft[i].u1.Function) break;
+        for(int i=0; i<65536; i++){
+            if(!oft[i].u1.AddressOfData) break;
             if(!(oft[i].u1.Ordinal&IMAGE_ORDINAL_FLAG64)){
                 IMAGE_IMPORT_BY_NAME* n=(IMAGE_IMPORT_BY_NAME*)(base+oft[i].u1.AddressOfData);
                 if(!strcmp((char*)n->Name,"SDL_GL_SwapWindow")) return &ft[i].u1.Function;
@@ -327,19 +343,53 @@ static void* FindIATEntry()
     return 0;
 }
 
+static DWORD WINAPI InitThread(LPVOID)
+{
+    // If injected while the game is already running, SDL2 is normally loaded.
+    // If injected at startup, wait a short time for it to appear.
+    for(int i=0; i<200; i++)
+    {
+        if(GetModuleHandleA("SDL2.dll")) break;
+        Sleep(50);
+    }
+
+    // Let the renderer finish initialization before changing its IAT slot.
+    Sleep(300);
+
+    void* slot=FindIATEntry();
+    if(!slot)
+    {
+        LogMsg("GlHudNice: SDL_GL_SwapWindow IAT entry not found");
+        return 0;
+    }
+
+    g_origSwap=*(Swap_t*)slot;
+
+    DWORD oldProtect=0;
+    if(VirtualProtect(slot, sizeof(void*), PAGE_READWRITE, &oldProtect))
+    {
+        *(Swap_t*)slot=Hook;
+        DWORD unused=0;
+        VirtualProtect(slot, sizeof(void*), oldProtect, &unused);
+        FlushInstructionCache(GetCurrentProcess(), slot, sizeof(void*));
+        g_hooked=true;
+        LogMsg("GlHudNice: hook installed from worker thread");
+    }
+    else
+    {
+        LogMsg("GlHudNice: VirtualProtect failed");
+    }
+    return 0;
+}
+
 BOOL APIENTRY DllMain(HMODULE h, DWORD r, LPVOID)
 {
     if(r==DLL_PROCESS_ATTACH){
         DisableThreadLibraryCalls(h);
-        void* slot=FindIATEntry();
-        if(slot){
-            g_origSwap=*(Swap_t*)slot;
-            DWORD op; VirtualProtect(slot,8,PAGE_READWRITE,&op);
-            *(Swap_t*)slot=Hook;
-            VirtualProtect(slot,8,op,&op);
-            g_hooked=true;
-            LogMsg("GlHudNice hook installed");
-        }
+        // Never install the hook directly under the loader lock. MO2's usvfs
+        // and other injectors can deadlock/crash if we do file/module work here.
+        HANDLE thread=CreateThread(NULL, 0, InitThread, h, 0, NULL);
+        if(thread) CloseHandle(thread);
     }
     return TRUE;
 }
