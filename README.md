@@ -72,6 +72,10 @@ game_path.txt             可选，手动指定 Darkest.exe 路径
   Source code: `src/`
 - 逆向笔记：`docs/REVERSE_ENGINEERING.md`  
   Reverse-engineering notes: `docs/REVERSE_ENGINEERING.md`
+- 游戏更新后适配指南：`docs/OFFSET_UPDATE_GUIDE.md`  
+  Update guide for game patches: `docs/OFFSET_UPDATE_GUIDE.md`
+- 一键更新脚本：`tools/Update-HUD.ps1`  
+  One-command update pipeline: `tools/Update-HUD.ps1`
 
 ## 免责声明 / Disclaimer
 

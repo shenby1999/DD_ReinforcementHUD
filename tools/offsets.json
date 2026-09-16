@@ -1,0 +1,21 @@
+{
+  "current": "25309191",
+  "builds": {
+    "25309191": {
+      "appStatePtrRVA": "0x117DB48",
+      "stallCountOffset": "0x2E4",
+      "stallFlagOffset": "0x2E8",
+      "summonThresholdRVA": "0x2ACBC04",
+      "stressThresholdRVA": "0x2ACBC00",
+      "resetThresholdRVA": "0x2ACBC08"
+    },
+    "24960041": {
+      "appStatePtrRVA": "0x1179A08",
+      "stallCountOffset": "0x4B7C",
+      "stallFlagOffset": "0x4B80",
+      "summonThresholdRVA": "0x2AC78B4",
+      "stressThresholdRVA": "0x2AC78B0",
+      "resetThresholdRVA": "0x2AC78B8"
+    }
+  }
+}
