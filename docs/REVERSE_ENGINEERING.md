@@ -11,8 +11,8 @@ Target:
 | Meaning | RVA / expression |
 | --- | --- |
 | Global app-state pointer | `module + 0x117DB48` (read 8-byte pointer) |
-| Stall counter (int32) | `*(appState + 0x2E4)` |
-| Stall accelerated flag | `appState + 0x2E8` (byte) |
+| Stall counter (int32) | `*(appState + 0x4B7C)` |
+| Stall accelerated flag | `appState + 0x4B80` (byte) |
 | Stress threshold | `module + 0x2ACBC00` (default `3`) |
 | Summon/reinforcement threshold | `module + 0x2ACBC04` (default `4`) |
 | Reset threshold | `module + 0x2ACBC08` (default `4`) |
@@ -30,8 +30,8 @@ Target:
 
 ```
 app = *(u64*)(base + 0x117DB48)
-count = *(i32*)(app + 0x2E4)
-flag = *(u8*)(app + 0x2E8)
+count = *(i32*)(app + 0x4B7C)
+flag = *(u8*)(app + 0x4B80)
 remaining = summon_threshold - count   // default: 4 - count
 ```
 

@@ -40,8 +40,8 @@
 
 ```text
 appState 指针      module + 0x117DB48
-stall 计数         appState + 0x2E4
-stall 加速标志     appState + 0x2E8
+stall 计数         appState + 0x4B7C
+stall 加速标志     appState + 0x4B80
 增援阈值           module + 0x2ACBC04
 压力阈值           module + 0x2ACBC00
 重置阈值           module + 0x2ACBC08
@@ -99,8 +99,8 @@ reset_threshold    = module + 0x2ACBC08
 
 ```text
 appState 全局指针  = module + 0x117DB48
-stall 计数         = appState + 0x2E4
-stall 加速标志     = appState + 0x2E8
+stall 计数         = appState + 0x4B7C
+stall 加速标志     = appState + 0x4B80
 ```
 
 重新定位的方法：
@@ -120,8 +120,8 @@ stall 加速标志     = appState + 0x2E8
 
 ```text
 全局指针 RVA       : 0x117DB48
-计数偏移           : 0x2E4
-加速标志偏移       : 0x2E8
+计数偏移           : 0x4B7C
+加速标志偏移       : 0x4B80
 ```
 
 ## 第五步：写入配置文件
@@ -137,8 +137,8 @@ tools/offsets.json
 ```json
 "25309191": {
   "appStatePtrRVA": "0x117DB48",
-  "stallCountOffset": "0x2E4",
-  "stallFlagOffset": "0x2E8",
+  "stallCountOffset": "0x4B7C",
+  "stallFlagOffset": "0x4B80",
   "summonThresholdRVA": "0x2ACBC04",
   "stressThresholdRVA": "0x2ACBC00",
   "resetThresholdRVA": "0x2ACBC08"

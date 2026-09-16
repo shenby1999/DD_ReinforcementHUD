@@ -203,7 +203,7 @@ static void DrawOverlay()
     // Darkest Dungeon 1 build 25309191 (2026-09-16 update) offsets.
     uintptr_t app = *(uintptr_t*)(base + 0x117DB48);
     int count=0, summon=4, flag=0;
-    if (app) { count = *(int*)(app + 0x2E4); flag = *(unsigned char*)(app + 0x2E8); summon = *(int*)(base + 0x2ACBC04); }
+    if (app) { count = *(int*)(app + 0x4B7C); flag = *(unsigned char*)(app + 0x4B80); summon = *(int*)(base + 0x2ACBC04); }
     // If the stall flag is active, the game may accelerate the count by a large
     // step on the next stall round. In that state a count of 1 can already mean
     // "reinforcements will trigger next round", so show 1 instead of 3.
